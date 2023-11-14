@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "likes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
