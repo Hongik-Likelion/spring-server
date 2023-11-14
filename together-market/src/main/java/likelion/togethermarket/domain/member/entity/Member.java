@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "member_id")
     private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
