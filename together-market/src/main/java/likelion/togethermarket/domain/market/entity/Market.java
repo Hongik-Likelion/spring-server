@@ -14,18 +14,18 @@ public class Market extends BaseTimeEntity {
     @Column(name = "market_id")
     private Long id;
 
-    @Column(name = "marketName")
+    @Column(name = "market_name")
     private String marketName;
 
-    @Column(name = "streetAddress")
+    @Column(name = "street_address")
     private String streetAddress;
 
-    @Column(name = "postalAddress")
+    @Column(name = "postal_address")
     private String postalAddress;
 
-    @Column(name = "hasToilet")
+    @Column(name = "has_toilet")
     private boolean hasToilet;
 
-    @Column(name = "hasParking")
+    @Column(name = "has_parking")
     private boolean hasParking;
 }
