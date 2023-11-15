@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/* UserDetails를 implement해 세부정보 커스터마이즈
+*  Param 에 member를 넣어서 생성 */
 public class CustomUserDetails implements UserDetails {
     private Member member;
 
@@ -26,12 +28,13 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return null;
-        //password는 쓸일 없을듯
+        // password는 쓸일 없을듯
     }
 
     @Override
     public String getUsername() {
         return member.getEmail();
+        // email을 subject로 쓸거임
     }
 
     @Override
