@@ -2,6 +2,7 @@ package likelion.togethermarket.global.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.*;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +65,14 @@ public class TokenProvider {
         return new UsernamePasswordAuthenticationToken(customUserDetails, "", customUserDetails.getAuthorities());
     }
 
-    //validate token 메서드 개발 해야함
+    // verify가 제대로 되면 true, 아니라면 JWTVerificationException 오류를 던짐
+    // 오류를 더 세분화해야함
+    public boolean validateToken(String token){
+        try {
+            JWT.require(Algorithm.HMAC256(key)).build().verify(token);
+            return true;
+        } catch (JWTVerificationException e){
+            throw e;
+        }
+    }
 }
