@@ -12,11 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Optional;
 
 
 @Component
-public class TokenProvider {
+public class JwtTokenProvider {
 
     private final String key;
     private final MemberRepository memberRepository;
@@ -25,7 +24,7 @@ public class TokenProvider {
     private Long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7L; //7일
 
     @Autowired
-    public TokenProvider(@Value("${jwt.secret}") String secretKey, MemberRepository memberRepository) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, MemberRepository memberRepository) {
         this.key = secretKey;
         this.memberRepository = memberRepository;
     }
