@@ -1,5 +1,7 @@
 package likelion.togethermarket.domain.member.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import likelion.togethermarket.domain.member.dto.SignupDto;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.entity.MemberRole;
@@ -59,4 +61,21 @@ public class AuthService {
     }
 
 
+    public ResponseEntity<?> reissueToken(String refreshToken) {
+
+        // refreshToken 이 Deprecated거나 유효하지 않으면 badRequest 반환
+        if (redisService.getValue(refreshToken) == "Deprecated" || tokenProvider.validateToken(refreshToken)){
+            return ResponseEntity.badRequest().build();
+        }
+
+        Long memberId = Long.valueOf(redisService.getValue(refreshToken));
+        Member member = memberRepository.findById(memberId).orElseThrow();
+
+        // 원래 있던 refreshToken 은 Deprecated로 설정, 새로 발급된 refreshToken도 저장
+        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
+        redisService.setValue(refreshToken, "Deprecated", 1000 * 60 * 60 * 24 * 7L);
+        redisService.setValue(jwtTokenDto.getRefreshToken(), memberId.toString(), 1000 * 60 * 60 * 24 * 7L);
+
+        return new ResponseEntity<JwtTokenDto>(jwtTokenDto, HttpStatus.ACCEPTED);
+    }
 }
