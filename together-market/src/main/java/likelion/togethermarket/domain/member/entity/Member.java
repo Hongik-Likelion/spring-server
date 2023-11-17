@@ -3,6 +3,7 @@ package likelion.togethermarket.domain.member.entity;
 import jakarta.persistence.*;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,13 @@ public class Member extends BaseTimeEntity {
     @Column(name = "introduction")
     private String introduction;
 
+    @Builder
+    public Member(Long id, String email, MemberRole memberRole, String nickName, String profile, String introduction) {
+        this.id = id;
+        this.email = email;
+        this.memberRole = memberRole;
+        this.nickName = nickName;
+        this.profile = profile;
+        this.introduction = introduction;
+    }
 }
