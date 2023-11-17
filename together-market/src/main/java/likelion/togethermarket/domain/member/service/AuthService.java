@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
     private final MemberRepository memberRepository;
@@ -46,5 +46,17 @@ public class AuthService {
         redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
         return new ResponseEntity<JwtTokenDto>(jwtTokenDto, HttpStatus.CREATED);
     }
+
+
+    public ResponseEntity<?> loginMember(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
+
+        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
+
+        // refreshToken 을 redis를 이용해 저장
+        redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
+        return new ResponseEntity<JwtTokenDto>(jwtTokenDto, HttpStatus.ACCEPTED);
+    }
+
 
 }
