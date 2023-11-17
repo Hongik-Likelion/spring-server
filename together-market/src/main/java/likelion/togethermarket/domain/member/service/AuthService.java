@@ -2,6 +2,8 @@ package likelion.togethermarket.domain.member.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import likelion.togethermarket.domain.member.dto.LoginDto;
+import likelion.togethermarket.domain.member.dto.ReissueDto;
 import likelion.togethermarket.domain.member.dto.SignupDto;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.entity.MemberRole;
@@ -50,8 +52,8 @@ public class AuthService {
     }
 
 
-    public ResponseEntity<?> loginMember(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow();
+    public ResponseEntity<?> loginMember(LoginDto loginDto) {
+        Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow();
 
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
 
@@ -61,10 +63,11 @@ public class AuthService {
     }
 
 
-    public ResponseEntity<?> reissueToken(String refreshToken) {
+    public ResponseEntity<?> reissueToken(ReissueDto reissueDto) {
+        String refreshToken = reissueDto.getRefreshToken();
 
         // refreshToken 이 Deprecated거나 유효하지 않으면 badRequest 반환
-        if (redisService.getValue(refreshToken) == "Deprecated" || tokenProvider.validateToken(refreshToken)){
+        if (redisService.getValue(refreshToken) == "Deprecated" || !tokenProvider.validateToken(refreshToken)){
             return ResponseEntity.badRequest().build();
         }
 
