@@ -1,5 +1,7 @@
 package likelion.togethermarket.domain.member.controller;
 
+import likelion.togethermarket.domain.member.dto.LoginDto;
+import likelion.togethermarket.domain.member.dto.ReissueDto;
 import likelion.togethermarket.domain.member.dto.SignupDto;
 import likelion.togethermarket.domain.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +29,14 @@ public class AuthController {
 
     //login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email){
-        return authService.loginMember(email);
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
+        return authService.loginMember(loginDto);
     }
 
     // reissue
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@RequestParam String refreshToken){
-        return authService.reissueToken(refreshToken);
+    public ResponseEntity<?> reissue(@RequestBody ReissueDto reissueDto){
+        return authService.reissueToken(reissueDto);
     }
 
 }
