@@ -37,8 +37,8 @@ public class SecurityConfig {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint);
 
-        httpSecurity.authorizeHttpRequests()
-                .requestMatchers("/api/**").permitAll();
+        httpSecurity.authorizeRequests()
+                        .requestMatchers("/user").permitAll();
 
         httpSecurity.apply(jwtSecurityConfig);
 
