@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,6 +21,11 @@ public class AuthController {
     //signup
     public ResponseEntity<?> signup(@RequestBody SignupDto signupDto){
         return authService.signupMember(signupDto);
+    }
+
+    //login
+    public ResponseEntity<?> login(@RequestParam String email){
+        return authService.loginMember(email);
     }
 
 }
