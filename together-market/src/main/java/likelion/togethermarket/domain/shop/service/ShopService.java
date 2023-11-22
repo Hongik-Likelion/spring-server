@@ -9,8 +9,11 @@ import likelion.togethermarket.domain.product.entity.SellingProducts;
 import likelion.togethermarket.domain.product.repository.ProductRepository;
 import likelion.togethermarket.domain.product.repository.SellingProductsRepository;
 import likelion.togethermarket.domain.shop.dto.ShopRegisterDto;
+import likelion.togethermarket.domain.shop.dto.response.WishShopResDto;
 import likelion.togethermarket.domain.shop.entity.Shop;
+import likelion.togethermarket.domain.shop.entity.WishShop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
+import likelion.togethermarket.domain.shop.repository.WishShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,7 @@ public class ShopService {
     private final SellingProductsRepository sellingProductsRepository;
     private final MarketRepository marketRepository;
     private final ProductRepository productRepository;
+    private final WishShopRepository wishShopRepository;
 
     @Transactional
     public ResponseEntity<?> registerShop(Long memberId, ShopRegisterDto reqDto) {
@@ -54,5 +58,16 @@ public class ShopService {
         }
 
         return new ResponseEntity<ShopRegisterDto>(reqDto, HttpStatusCode.valueOf(201));
+    }
+
+    public ResponseEntity<?> registerWishShop(Long memberId, Long shopId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Shop shop = shopRepository.findById(shopId).orElseThrow();
+        WishShop wishShop = WishShop.builder().shop(shop).member(member).build();
+        wishShopRepository.save(wishShop);
+        WishShopResDto resDto = WishShopResDto.builder().shop_id(shop.getId().intValue())
+                .message("Success Add favourite shop").build();
+
+        return new ResponseEntity<WishShopResDto>(resDto, HttpStatusCode.valueOf(201));
     }
 }

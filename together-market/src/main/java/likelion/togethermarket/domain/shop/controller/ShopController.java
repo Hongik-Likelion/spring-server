@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ShopController {
     private final ShopService shopService;
 
+
+    // 새로운 가게 등록
     @PostMapping("")
     public ResponseEntity<?> registerNewShop(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -25,4 +25,15 @@ public class ShopController {
         Long memberId = customUserDetails.getMember().getId();
         return shopService.registerShop(memberId, reqDto);
     }
+
+    // 가게 즐겨찾기
+    @PatchMapping("/{shop_id}/favourite")
+    public ResponseEntity<?> registerNewWishShop(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("shop_id") Long shopId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return shopService.registerWishShop(memberId, shopId);
+    }
+
 }
