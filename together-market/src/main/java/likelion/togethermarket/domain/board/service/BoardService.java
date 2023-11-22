@@ -22,6 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.OptionalDouble;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -51,6 +54,7 @@ public class BoardService {
                     .rating(boardRegisterDto.getRating())
                     .content(boardRegisterDto.getContent())
                     .build();
+            shop.updateRating(getLatestAverageRating(shop)); // 평균 별점 업데이트
         }
         else {
             board = Board.builder().member(member)  //board 저장, Owner 일때 (rating 없음)
@@ -76,6 +80,13 @@ public class BoardService {
         }
 
         return new ResponseEntity<BoardRegisterDto>(boardRegisterDto, HttpStatusCode.valueOf(201));
+    }
+
+    public float getLatestAverageRating(Shop shop){
+        List<Board> boardList = boardRepository.findAllByShop(shop);
+        OptionalDouble average = boardList.stream().map(Board::getRating).toList()
+                .stream().mapToInt(Integer::intValue).average();
+        return (float) average.getAsDouble();
     }
 
 }
