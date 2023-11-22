@@ -46,4 +46,10 @@ public class Shop extends BaseTimeEntity {
     @Column(name = "rating")
     private Float rating;
 
+    public void modifyShopInfo(String newShopName, String newOpening, String newClosing){
+        this.shopName = newShopName;
+        this.openingTime = newOpening;
+        this.closingTime = newClosing;
+    }
+
 }
