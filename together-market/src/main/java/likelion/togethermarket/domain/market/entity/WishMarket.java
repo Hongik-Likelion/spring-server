@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,10 @@ public class WishMarket extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "market_id")
     private Market market;
+
+    @Builder
+    public WishMarket(Member member, Market market) {
+        this.member = member;
+        this.market = market;
+    }
 }
