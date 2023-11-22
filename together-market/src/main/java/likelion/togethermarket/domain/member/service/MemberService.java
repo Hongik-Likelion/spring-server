@@ -5,9 +5,12 @@ import likelion.togethermarket.domain.market.entity.Market;
 import likelion.togethermarket.domain.market.entity.WishMarket;
 import likelion.togethermarket.domain.market.repository.MarketRepository;
 import likelion.togethermarket.domain.market.repository.WishMarketRepository;
-import likelion.togethermarket.domain.member.dto.CustomerInfoResDto;
-import likelion.togethermarket.domain.member.dto.OwnerInfoResDto;
-import likelion.togethermarket.domain.member.dto.OwnerMarketDto;
+import likelion.togethermarket.domain.member.dto.request.CustomerModifyReqDto;
+import likelion.togethermarket.domain.member.dto.request.OwnerModifyReqDto;
+import likelion.togethermarket.domain.member.dto.response.CustomerInfoResDto;
+import likelion.togethermarket.domain.member.dto.response.ModifyResDto;
+import likelion.togethermarket.domain.member.dto.response.OwnerInfoResDto;
+import likelion.togethermarket.domain.member.dto.response.OwnerMarketDto;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.entity.MemberRole;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
@@ -73,4 +76,46 @@ public class MemberService {
     }
 
 
+    public ResponseEntity<?> modifyCustomerInfo(Long memberId, CustomerModifyReqDto modifyRequestDto) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+
+        wishMarketRepository.deleteAllByMember(member);  // 선호 가게 수정 (전부 없애고, 다시 다 만들어줌)
+        for (Integer i : modifyRequestDto.getFavourite_markets()) {
+            Market market = marketRepository.findById(Long.valueOf(i)).orElseThrow();
+            WishMarket wish = WishMarket.builder().market(market).member(member).build();
+            wishMarketRepository.save(wish);
+        }
+        member.modifyNickname(modifyRequestDto.getNickname());
+        member.modifyIntro(modifyRequestDto.getIntroduction());
+
+        ModifyResDto modifyResDto = ModifyResDto.builder()
+                .nickname(member.getNickName())
+                .email(member.getEmail())
+                .introduction(member.getIntroduction())
+                .profile(member.getProfile())
+                .is_owner(false).build();
+
+        return new ResponseEntity<ModifyResDto>(modifyResDto, HttpStatusCode.valueOf(200));
+    }
+
+    public ResponseEntity<?> modifyOwnerInfo(Long memberId, OwnerModifyReqDto modifyRequestDto) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+
+        Shop shop = shopRepository.findByMember(member).orElseThrow();
+        // 사장의 닉네임, 소개 + 가게의 이름, open, close 시간 수정
+        member.modifyNickname(modifyRequestDto.getShop_name());
+        member.modifyIntro(modifyRequestDto.getIntroduction());
+        shop.modifyShopInfo(modifyRequestDto.getShop_name(),
+                modifyRequestDto.getOpening_time(),
+                modifyRequestDto.getClosing_time());
+
+        ModifyResDto modifyResDto = ModifyResDto.builder()
+                .email(member.getEmail())
+                .nickname(member.getNickName())
+                .profile(member.getProfile())
+                .introduction(member.getIntroduction())
+                .is_owner(true).build();
+
+        return new ResponseEntity<ModifyResDto>(modifyResDto, HttpStatusCode.valueOf(200));
+    }
 }
