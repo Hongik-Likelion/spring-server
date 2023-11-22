@@ -119,4 +119,10 @@ public class BoardService {
 
         return new ResponseEntity<BoardModifyDto>(boardModifyDto, HttpStatusCode.valueOf(200));
     }
+
+    public ResponseEntity<?> deleteBoard(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow();
+        boardRepository.delete(board);
+        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    }
 }

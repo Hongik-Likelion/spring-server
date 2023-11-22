@@ -37,4 +37,12 @@ public class BoardController {
         return boardService.modifyBoard(memberId, boardModifyDto, boardId);
     }
 
+    // 게시글 삭제
+    @DeleteMapping("/{board_id}")
+    public ResponseEntity<?> deleteMyBoard(
+            @PathVariable("board_id") Long boardId
+    ){
+        return boardService.deleteBoard(boardId);
+    }
+
 }
