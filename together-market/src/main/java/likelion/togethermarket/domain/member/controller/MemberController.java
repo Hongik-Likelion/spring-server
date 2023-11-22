@@ -41,4 +41,14 @@ public class MemberController {
         Long memberId = customUserDetails.getMember().getId();
         return memberService.modifyOwnerInfo(memberId, modifyRequestDto);
     }
+
+    @PatchMapping("/{user_id}/block")
+    public ResponseEntity<?> blockOtherUser(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("user_id") Long blockMemberId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return memberService.blockUser(memberId, blockMemberId);
+    }
+
 }
