@@ -3,6 +3,7 @@ package likelion.togethermarket.domain.board.entity;
 import jakarta.persistence.*;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,10 @@ public class BoardPhoto extends BaseTimeEntity {
 
     @Column(name = "image", nullable = false)
     private String image;
+
+    @Builder
+    public BoardPhoto(Board board, String image) {
+        this.board = board;
+        this.image = image;
+    }
 }
