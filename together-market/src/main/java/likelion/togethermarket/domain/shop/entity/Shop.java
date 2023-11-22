@@ -6,6 +6,7 @@ import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.product.entity.SellingProducts;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -49,12 +50,24 @@ public class Shop extends BaseTimeEntity {
     @Column(name = "rating")
     private Float rating;
 
+    @OneToMany(mappedBy = "shop")
+    private List<SellingProducts> products;
+
     public void modifyShopInfo(String newShopName, String newOpening, String newClosing){
         this.shopName = newShopName;
         this.openingTime = newOpening;
         this.closingTime = newClosing;
     }
 
-    @OneToMany(mappedBy = "shop")
-    private List<SellingProducts> products;
+    @Builder
+    public Shop(Market market, Member member, String shopName, String shopAddress, String sellingProducts, String openingTime, String closingTime, String openingFrequency) {
+        this.market = market;
+        this.member = member;
+        this.shopName = shopName;
+        this.shopAddress = shopAddress;
+        this.sellingProducts = sellingProducts;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.openingFrequency = openingFrequency;
+    }
 }
