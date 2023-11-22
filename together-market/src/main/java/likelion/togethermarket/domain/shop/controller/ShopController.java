@@ -3,6 +3,7 @@ package likelion.togethermarket.domain.shop.controller;
 import likelion.togethermarket.domain.shop.dto.ShopRegisterDto;
 import likelion.togethermarket.domain.shop.service.ShopService;
 import likelion.togethermarket.global.jwt.CustomUserDetails;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,4 +62,14 @@ public class ShopController {
     ){
         return shopService.searchDetail(shopId);
     }
+
+    // 나의 관심가게 조회
+    @GetMapping("")
+    public ResponseEntity<?> showMyFavouriteShops(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return shopService.searchWishShop(memberId);
+    }
+
 }

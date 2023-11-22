@@ -9,6 +9,7 @@ import likelion.togethermarket.domain.product.entity.SellingProducts;
 import likelion.togethermarket.domain.product.repository.ProductRepository;
 import likelion.togethermarket.domain.product.repository.SellingProductsRepository;
 import likelion.togethermarket.domain.shop.dto.ShopRegisterDto;
+import likelion.togethermarket.domain.shop.dto.response.FavouriteShopResDto;
 import likelion.togethermarket.domain.shop.dto.response.ShopDetailResDto;
 import likelion.togethermarket.domain.shop.dto.response.SimpleShopResDto;
 import likelion.togethermarket.domain.shop.dto.response.WishShopResDto;
@@ -109,8 +110,17 @@ public class ShopService {
                 .opening_time(shop.getOpeningTime())
                 .closing_time(shop.getClosingTime())
                 .opening_frequency(shop.getOpeningFrequency())
-                .rating(shop.getRating()).build();
+                .average_rating(shop.getRating()).build();
 
         return new ResponseEntity<ShopDetailResDto>(resDto, HttpStatusCode.valueOf(200));
+    }
+
+    public ResponseEntity<?> searchWishShop(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        List<Shop> shops = wishShopRepository.findAllByMember(member).stream().map(WishShop::getShop).toList();
+        List<FavouriteShopResDto> favouriteShopResDtos = shops.stream().map(FavouriteShopResDto::new).toList();
+
+        return new ResponseEntity<List<FavouriteShopResDto>>(favouriteShopResDtos, HttpStatusCode.valueOf(200));
+
     }
 }
