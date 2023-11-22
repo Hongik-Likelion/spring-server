@@ -33,6 +33,7 @@ public class ShopService {
     private final ProductRepository productRepository;
     private final WishShopRepository wishShopRepository;
 
+    // 새 가게 등록
     @Transactional
     public ResponseEntity<?> registerShop(Long memberId, ShopRegisterDto reqDto) {
         Member member = memberRepository.findById(memberId).orElseThrow();
@@ -60,14 +61,31 @@ public class ShopService {
         return new ResponseEntity<ShopRegisterDto>(reqDto, HttpStatusCode.valueOf(201));
     }
 
+    // 가게 즐겨찾기 등록
+    @Transactional
     public ResponseEntity<?> registerWishShop(Long memberId, Long shopId) {
         Member member = memberRepository.findById(memberId).orElseThrow();
         Shop shop = shopRepository.findById(shopId).orElseThrow();
         WishShop wishShop = WishShop.builder().shop(shop).member(member).build();
         wishShopRepository.save(wishShop);
         WishShopResDto resDto = WishShopResDto.builder().shop_id(shop.getId().intValue())
-                .message("Success Add favourite shop").build();
+                .message("Success add favourite shop").build();
 
         return new ResponseEntity<WishShopResDto>(resDto, HttpStatusCode.valueOf(201));
     }
+
+    // 가게 즐겨찾기 삭제
+    @Transactional
+    public ResponseEntity<?> deleteWishShop(Long memberId, Long shopId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Shop shop = shopRepository.findById(shopId).orElseThrow();
+        WishShop wishShop = wishShopRepository.findByMemberAndShop(member, shop).orElseThrow();
+        wishShopRepository.delete(wishShop);
+
+        WishShopResDto resDto = WishShopResDto.builder().shop_id(shop.getId().intValue())
+                .message("Success delete favourite shop").build();
+
+        return new ResponseEntity<WishShopResDto>(resDto, HttpStatusCode.valueOf(200));
+    }
+
 }
