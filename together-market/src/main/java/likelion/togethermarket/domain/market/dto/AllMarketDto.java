@@ -1,5 +1,6 @@
 package likelion.togethermarket.domain.market.dto;
 
+import likelion.togethermarket.domain.market.entity.Market;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,9 +11,9 @@ public class AllMarketDto {
     private String market_name;
     private String market_address;
 
-    public AllMarketDto(int market_id, String market_name, String market_address) {
-        this.market_id = market_id;
-        this.market_name = market_name;
-        this.market_address = market_address;
+    public AllMarketDto(Market market) {
+        this.market_id = market.getId().intValue();
+        this.market_name = market.getMarketName();
+        this.market_address = market.getStreetAddress();
     }
 }

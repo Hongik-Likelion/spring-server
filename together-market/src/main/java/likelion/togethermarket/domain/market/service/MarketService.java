@@ -27,11 +27,12 @@ public class MarketService {
 
     public ResponseEntity<?> getMarkets() {
         List<Market> markets = marketRepository.findAll();
-        List<BasicMarketDto> marketDtos = markets.stream().map(BasicMarketDto::new).toList();
+        List<AllMarketDto> marketDtos = markets.stream().map(AllMarketDto::new).toList();
 
-        return new ResponseEntity<List<BasicMarketDto>>(marketDtos, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<List<AllMarketDto>>(marketDtos, HttpStatusCode.valueOf(200));
     }
 
+    @Transactional
     public ResponseEntity<?> registerWishMarket(Long memberId, WishMarketReqDto reqDto) {
         Member member = memberRepository.findById(memberId).orElseThrow();
 
