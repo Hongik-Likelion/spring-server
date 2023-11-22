@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,9 @@ public class SellingProducts extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Shop shop;
 
+    @Builder
+    public SellingProducts(Product product, Shop shop) {
+        this.product = product;
+        this.shop = shop;
+    }
 }
