@@ -3,10 +3,13 @@ package likelion.togethermarket.domain.shop.entity;
 import jakarta.persistence.*;
 import likelion.togethermarket.domain.market.entity.Market;
 import likelion.togethermarket.domain.member.entity.Member;
+import likelion.togethermarket.domain.product.entity.SellingProducts;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -46,4 +49,6 @@ public class Shop extends BaseTimeEntity {
     @Column(name = "rating")
     private Float rating;
 
+    @OneToMany(mappedBy = "shop")
+    private List<SellingProducts> products;
 }
