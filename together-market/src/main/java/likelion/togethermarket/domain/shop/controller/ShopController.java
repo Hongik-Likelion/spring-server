@@ -53,4 +53,12 @@ public class ShopController {
     ){
         return shopService.showAllShop(market_id);
     }
+
+    // 상점 조회
+    @GetMapping("/{shop_id}")
+    public ResponseEntity<?> searchShopDetail(
+            @PathVariable("shop_id") Long shopId
+    ){
+        return shopService.searchDetail(shopId);
+    }
 }

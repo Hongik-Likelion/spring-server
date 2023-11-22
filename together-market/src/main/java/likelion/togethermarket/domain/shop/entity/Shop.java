@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class Shop extends BaseTimeEntity {
     private String openingFrequency; // e.g. 매주, 매달, 격주 ...
 
     @Column(name = "rating")
+    @ColumnDefault("0")
     private Float rating;
 
     @OneToMany(mappedBy = "shop")

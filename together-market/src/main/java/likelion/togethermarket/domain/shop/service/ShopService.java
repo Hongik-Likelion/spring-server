@@ -9,6 +9,7 @@ import likelion.togethermarket.domain.product.entity.SellingProducts;
 import likelion.togethermarket.domain.product.repository.ProductRepository;
 import likelion.togethermarket.domain.product.repository.SellingProductsRepository;
 import likelion.togethermarket.domain.shop.dto.ShopRegisterDto;
+import likelion.togethermarket.domain.shop.dto.response.ShopDetailResDto;
 import likelion.togethermarket.domain.shop.dto.response.SimpleShopResDto;
 import likelion.togethermarket.domain.shop.dto.response.WishShopResDto;
 import likelion.togethermarket.domain.shop.entity.Shop;
@@ -96,5 +97,20 @@ public class ShopService {
         List<SimpleShopResDto> simpleShopResDtos = shopList.stream().map(SimpleShopResDto::new).toList();
 
         return new ResponseEntity<List<SimpleShopResDto>>(simpleShopResDtos, HttpStatusCode.valueOf(200));
+    }
+
+    // 상점 하나를 조회
+    public ResponseEntity<?> searchDetail(Long shopId) {
+        Shop shop = shopRepository.findById(shopId).orElseThrow();
+
+        ShopDetailResDto resDto = ShopDetailResDto.builder().shop_name(shop.getShopName())
+                .shop_address(shop.getShopAddress())
+                .selling_products(shop.getSellingProducts())
+                .opening_time(shop.getOpeningTime())
+                .closing_time(shop.getClosingTime())
+                .opening_frequency(shop.getOpeningFrequency())
+                .rating(shop.getRating()).build();
+
+        return new ResponseEntity<ShopDetailResDto>(resDto, HttpStatusCode.valueOf(200));
     }
 }
