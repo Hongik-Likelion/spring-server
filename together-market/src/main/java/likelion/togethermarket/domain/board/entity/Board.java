@@ -1,11 +1,13 @@
 package likelion.togethermarket.domain.board.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import likelion.togethermarket.domain.market.entity.Market;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,8 +40,18 @@ public class Board extends BaseTimeEntity {
     @Column(name = "content")
     private String content;
 
+    @Nullable
     @Column(name = "rating")
     private int rating;
 
-
+    @Builder
+    public Board(Member member, Market market, Shop shop, String marketName, String shopName, String content, int rating) {
+        this.member = member;
+        this.market = market;
+        this.shop = shop;
+        this.marketName = marketName;
+        this.shopName = shopName;
+        this.content = content;
+        this.rating = rating;
+    }
 }

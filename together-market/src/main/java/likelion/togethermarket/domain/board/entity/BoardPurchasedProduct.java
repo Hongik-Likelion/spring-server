@@ -1,6 +1,7 @@
 package likelion.togethermarket.domain.board.entity;
 
 import jakarta.persistence.*;
+import likelion.togethermarket.domain.product.entity.Product;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,21 +11,20 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BoardPhoto extends BaseTimeEntity {
+public class BoardPurchasedProduct extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "image_id")
+    @Column(name = "purchased_product_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
     private Board board;
 
-    @Column(name = "image", nullable = false)
-    private String image;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product product;
 
     @Builder
-    public BoardPhoto(Board board, String image) {
+    public BoardPurchasedProduct(Board board, Product product) {
         this.board = board;
-        this.image = image;
+        this.product = product;
     }
 }
