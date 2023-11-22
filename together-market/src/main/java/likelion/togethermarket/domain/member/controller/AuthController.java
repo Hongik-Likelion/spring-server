@@ -1,8 +1,8 @@
 package likelion.togethermarket.domain.member.controller;
 
-import likelion.togethermarket.domain.member.dto.LoginDto;
-import likelion.togethermarket.domain.member.dto.ReissueDto;
-import likelion.togethermarket.domain.member.dto.SignupDto;
+import likelion.togethermarket.domain.member.dto.request.LoginDto;
+import likelion.togethermarket.domain.member.dto.request.ReissueDto;
+import likelion.togethermarket.domain.member.dto.request.SignupDto;
 import likelion.togethermarket.domain.member.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package likelion.togethermarket.domain.member.dto;
+package likelion.togethermarket.domain.member.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
