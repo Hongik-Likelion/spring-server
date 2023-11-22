@@ -2,18 +2,21 @@ package likelion.togethermarket.domain.board.service;
 
 import likelion.togethermarket.domain.board.dto.BoardModifyDto;
 import likelion.togethermarket.domain.board.dto.BoardRegisterDto;
+import likelion.togethermarket.domain.board.dto.boardListDto.BoardInfoDto;
+import likelion.togethermarket.domain.board.dto.boardListDto.FinalBoardListDto;
+import likelion.togethermarket.domain.board.dto.boardListDto.MemberInfoDto;
+import likelion.togethermarket.domain.board.dto.boardListDto.ShopInfoDto;
 import likelion.togethermarket.domain.board.entity.Board;
 import likelion.togethermarket.domain.board.entity.BoardPhoto;
 import likelion.togethermarket.domain.board.entity.BoardPurchasedProduct;
-import likelion.togethermarket.domain.board.repository.BoardPhotoRepository;
-import likelion.togethermarket.domain.board.repository.BoardPurchasedProductRepository;
-import likelion.togethermarket.domain.board.repository.BoardRepository;
+import likelion.togethermarket.domain.board.repository.*;
 import likelion.togethermarket.domain.market.entity.Market;
 import likelion.togethermarket.domain.market.repository.MarketRepository;
+import likelion.togethermarket.domain.member.entity.BlackList;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.entity.MemberRole;
+import likelion.togethermarket.domain.member.repository.BlackListRepository;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
-import likelion.togethermarket.domain.product.entity.Product;
 import likelion.togethermarket.domain.product.repository.ProductRepository;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
@@ -23,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
@@ -37,6 +41,9 @@ public class BoardService {
     private final MarketRepository marketRepository;
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
+    private final ReportRepository reportRepository;
+    private final LikeRepository likeRepository;
+    private final BlackListRepository blackListRepository;
 
 
     @Transactional
@@ -84,8 +91,8 @@ public class BoardService {
 
     public float getLatestAverageRating(Shop shop){
         List<Board> boardList = boardRepository.findAllByShop(shop);
-        OptionalDouble average = boardList.stream().map(Board::getRating).toList()
-                .stream().mapToInt(Integer::intValue).average();
+        OptionalDouble average = boardList.stream()
+                .mapToInt(Board::getRating).average();
         return (float) average.getAsDouble();
     }
 
@@ -120,9 +127,52 @@ public class BoardService {
         return new ResponseEntity<BoardModifyDto>(boardModifyDto, HttpStatusCode.valueOf(200));
     }
 
+    // 게시글 삭제
     public ResponseEntity<?> deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow();
         boardRepository.delete(board);
+        board.getShop().updateRating(getLatestAverageRating(board.getShop()));
         return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    }
+
+    // 시장 게시글 전체 조회
+    public ResponseEntity<?> getBoardList(Long memberId, Long marketId) {
+        Member reqMember = memberRepository.findById(memberId).orElseThrow(); // 요청을 보낸 멤버
+        Market market = marketRepository.findById(marketId).orElseThrow();
+        List<Board> boards = boardRepository.findAllByMarket(market);
+
+
+        List<Board> boardsToRemove = new ArrayList<>();  // 조회하지 않을 명단
+        for (Board board : boards){
+            List<BlackList> blackLists = blackListRepository.findAllByMember(reqMember);
+            if (reportRepository.countByBoard(board) > 4L){
+                boardsToRemove.add(board);  // 신고 누적 4회 이상은 조회 x 명단에 추가
+            } else if (blackLists.stream().anyMatch(blackList
+                    -> blackList.getBlackListId().equals(board.getMember().getId()))) {
+                boardsToRemove.add(board);  // 내가 블락한 유저가 쓴 글도 조회 x 명단에 추가
+            }
+        }
+        boards.removeAll(boardsToRemove);  // 조회 x 명단 제거
+
+        List<FinalBoardListDto> boardListDtos = new ArrayList<>();  // 반환할 최종 DTO 빌드
+        for (Board board : boards){
+            List<BoardPhoto> boardPhotos = boardPhotoRepository.findAllByBoard(board);
+            long likeCount = likeRepository.countByBoard(board);
+
+            BoardInfoDto boardInfoDto = BoardInfoDto.builder().board(board)   // board_info 생성
+                    .is_liked(likeRepository.existsByBoardAndMember(board, reqMember))
+                    .like_count((int) likeCount)
+                    .photo(boardPhotos.isEmpty() ? null : boardPhotos.get(0).getImage()).build();
+
+            MemberInfoDto memberInfoDto = MemberInfoDto.builder().board(board).build();// user_info 생성
+
+            ShopInfoDto shopInfoDto = ShopInfoDto.builder().board(board).build();// shop_info 생성
+
+            FinalBoardListDto listDto = FinalBoardListDto.builder().user_info(memberInfoDto)
+                    .shop_info(shopInfoDto).board_info(boardInfoDto).build();
+            boardListDtos.add(listDto);
+        }
+
+        return new ResponseEntity<List<FinalBoardListDto>>(boardListDtos, HttpStatusCode.valueOf(200));
     }
 }
