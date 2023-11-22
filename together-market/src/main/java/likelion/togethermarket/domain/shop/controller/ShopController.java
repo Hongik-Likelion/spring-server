@@ -36,4 +36,12 @@ public class ShopController {
         return shopService.registerWishShop(memberId, shopId);
     }
 
+    @PatchMapping("/{shop_id}/de-favourite")
+    public ResponseEntity<?> deleteWishShop(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("shop_id") Long shopId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return shopService.deleteWishShop(memberId, shopId);
+    }
 }
