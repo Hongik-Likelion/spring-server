@@ -1,4 +1,4 @@
-package likelion.togethermarket.domain.member.dto;
+package likelion.togethermarket.domain.member.dto.response;
 
 import likelion.togethermarket.domain.product.entity.Product;
 import likelion.togethermarket.domain.product.entity.SellingProducts;

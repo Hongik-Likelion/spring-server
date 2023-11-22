@@ -40,4 +40,14 @@ public class Member extends BaseTimeEntity {
         this.profile = profile;
         this.introduction = introduction;
     }
+
+    // nickname 수정 메서드
+    public void modifyNickname(String newNickname){
+        this.nickName = newNickname;
+    }
+
+    // introduction 수정 메서드
+    public void modifyIntro(String newIntro){
+        this.introduction = newIntro;
+    }
 }

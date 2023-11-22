@@ -1,10 +1,8 @@
 package likelion.togethermarket.domain.member.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import likelion.togethermarket.domain.member.dto.LoginDto;
-import likelion.togethermarket.domain.member.dto.ReissueDto;
-import likelion.togethermarket.domain.member.dto.SignupDto;
+import likelion.togethermarket.domain.member.dto.request.LoginDto;
+import likelion.togethermarket.domain.member.dto.request.ReissueDto;
+import likelion.togethermarket.domain.member.dto.request.SignupDto;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.entity.MemberRole;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
@@ -13,13 +11,11 @@ import likelion.togethermarket.global.jwt.JwtTokenProvider;
 import likelion.togethermarket.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
