@@ -45,4 +45,14 @@ public class BoardController {
         return boardService.deleteBoard(boardId);
     }
 
+    // 시장의 모든 게시글 조회
+    @GetMapping("")
+    public ResponseEntity<?> getAllBoardInMarket(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam("market_id") Long market_id
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.getBoardList(memberId, market_id);
+    }
+
 }
