@@ -1,6 +1,8 @@
 package likelion.togethermarket.domain.member.dto;
 
 import likelion.togethermarket.domain.product.entity.Product;
+import likelion.togethermarket.domain.product.entity.SellingProducts;
+import likelion.togethermarket.domain.shop.entity.Shop;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,5 +18,17 @@ public class OwnerMarketDto {
     private String opening_time;
     private String closing_time;
     private String opening_frequency;
-    private List<Product> product_categories;
+    private List<Integer> product_categories;
+
+    public OwnerMarketDto(Shop shop) {
+        this.market_id = Math.toIntExact(shop.getMarket().getId());
+        this.shop_name = shop.getShopName();
+        this.shop_address = shop.getShopAddress();
+        this.selling_products = shop.getSellingProducts();
+        this.opening_time = shop.getOpeningTime();
+        this.closing_time = shop.getClosingTime();
+        this.opening_frequency = shop.getOpeningFrequency();
+        this.product_categories = (List<Integer>) shop.getProducts().stream()
+                .map(SellingProducts::getId).toList().stream().mapToInt(Long::intValue);
+    }
 }
