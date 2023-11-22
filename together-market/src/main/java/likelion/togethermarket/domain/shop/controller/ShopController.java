@@ -36,6 +36,7 @@ public class ShopController {
         return shopService.registerWishShop(memberId, shopId);
     }
 
+    // 가게 즐겨찾기 삭제
     @PatchMapping("/{shop_id}/de-favourite")
     public ResponseEntity<?> deleteWishShop(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -43,5 +44,13 @@ public class ShopController {
     ){
         Long memberId = customUserDetails.getMember().getId();
         return shopService.deleteWishShop(memberId, shopId);
+    }
+
+    // 시장에 존재하는 모든 가게 조회
+    @GetMapping("")
+    public ResponseEntity<?> searchAllShopInMarket(
+            @RequestParam("market_id") Long market_id
+    ){
+        return shopService.showAllShop(market_id);
     }
 }

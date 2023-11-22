@@ -9,6 +9,7 @@ import likelion.togethermarket.domain.product.entity.SellingProducts;
 import likelion.togethermarket.domain.product.repository.ProductRepository;
 import likelion.togethermarket.domain.product.repository.SellingProductsRepository;
 import likelion.togethermarket.domain.shop.dto.ShopRegisterDto;
+import likelion.togethermarket.domain.shop.dto.response.SimpleShopResDto;
 import likelion.togethermarket.domain.shop.dto.response.WishShopResDto;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.entity.WishShop;
@@ -88,4 +89,12 @@ public class ShopService {
         return new ResponseEntity<WishShopResDto>(resDto, HttpStatusCode.valueOf(200));
     }
 
+    // 시장의 모든 상점 조회
+    public ResponseEntity<?> showAllShop(Long marketId) {
+        Market market = marketRepository.findById(marketId).orElseThrow();
+        List<Shop> shopList = shopRepository.findAllByMarket(market);
+        List<SimpleShopResDto> simpleShopResDtos = shopList.stream().map(SimpleShopResDto::new).toList();
+
+        return new ResponseEntity<List<SimpleShopResDto>>(simpleShopResDtos, HttpStatusCode.valueOf(200));
+    }
 }
