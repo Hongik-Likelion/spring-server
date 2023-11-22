@@ -61,6 +61,10 @@ public class Shop extends BaseTimeEntity {
         this.closingTime = newClosing;
     }
 
+    public void updateRating(float newRating){
+        this.rating = newRating;
+    }
+
     @Builder
     public Shop(Market market, Member member, String shopName, String shopAddress, String sellingProducts, String openingTime, String closingTime, String openingFrequency) {
         this.market = market;
