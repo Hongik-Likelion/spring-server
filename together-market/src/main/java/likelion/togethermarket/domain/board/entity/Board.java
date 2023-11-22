@@ -44,6 +44,22 @@ public class Board extends BaseTimeEntity {
     @Column(name = "rating")
     private int rating;
 
+    // 사장용
+    public void modify(String marketName, String shopName, String content){
+        this.marketName = marketName;
+        this.shopName = shopName;
+        this.content = content;
+    }
+
+    // 고객용
+    public void modify(String marketName, String shopName, String content, int rating){
+        this.marketName = marketName;
+        this.shopName = shopName;
+        this.content = content;
+        this.rating = rating;
+    }
+
+
     @Builder
     public Board(Member member, Market market, Shop shop, String marketName, String shopName, String content, int rating) {
         this.member = member;

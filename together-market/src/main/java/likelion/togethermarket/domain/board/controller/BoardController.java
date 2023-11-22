@@ -1,5 +1,6 @@
 package likelion.togethermarket.domain.board.controller;
 
+import likelion.togethermarket.domain.board.dto.BoardModifyDto;
 import likelion.togethermarket.domain.board.dto.BoardRegisterDto;
 import likelion.togethermarket.domain.board.service.BoardService;
 import likelion.togethermarket.global.jwt.CustomUserDetails;
@@ -7,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,12 +16,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class BoardController {
     private final BoardService boardService;
 
+    // 게시글 등록
     @PostMapping("")
     public ResponseEntity<?> registerNewBoard(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody BoardRegisterDto boardRegisterDto
-            ){
+    ){
         Long memberId = customUserDetails.getMember().getId();
         return boardService.registerBoard(memberId, boardRegisterDto);
     }
+
+    // 게시글 수정
+    @PutMapping("/{board_id}")
+    public ResponseEntity<?> modifyMyBoard(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody BoardModifyDto boardModifyDto,
+            @PathVariable("board_id") Long boardId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.modifyBoard(memberId, boardModifyDto, boardId);
+    }
+
 }

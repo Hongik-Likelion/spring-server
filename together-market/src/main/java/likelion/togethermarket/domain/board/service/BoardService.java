@@ -1,5 +1,6 @@
 package likelion.togethermarket.domain.board.service;
 
+import likelion.togethermarket.domain.board.dto.BoardModifyDto;
 import likelion.togethermarket.domain.board.dto.BoardRegisterDto;
 import likelion.togethermarket.domain.board.entity.Board;
 import likelion.togethermarket.domain.board.entity.BoardPhoto;
@@ -67,17 +68,16 @@ public class BoardService {
         }
         boardRepository.save(board);
 
-        for (String photo : boardRegisterDto.getPhoto()) {  // boardPhoto 저장
-            BoardPhoto boardPhoto = BoardPhoto.builder().board(board).image(photo).build();
-            boardPhotoRepository.save(boardPhoto);
-        }
+        Board finalBoard = board;
+        boardRegisterDto.getPhoto().stream()  // boardPhoto 저장
+                .map(photo -> BoardPhoto.builder().board(finalBoard).image(photo).build())
+                .forEach(boardPhotoRepository::save);
 
-        for (Integer productId : boardRegisterDto.getPurchased_products()) {  // purchasedProducts 저장
-            Product product = productRepository.findById(Long.valueOf(productId)).orElseThrow();
-            BoardPurchasedProduct purchasedProduct
-                    = BoardPurchasedProduct.builder().board(board).product(product).build();
-            purchasedProductRepository.save(purchasedProduct);
-        }
+        boardRegisterDto.getPurchased_products().stream()  // purchaseProducts 저장
+                .map(product_id -> BoardPurchasedProduct.builder()
+                        .board(finalBoard)
+                        .product(productRepository.findById(Long.valueOf(product_id)).orElseThrow()).build())
+                .forEach(purchasedProductRepository::save);
 
         return new ResponseEntity<BoardRegisterDto>(boardRegisterDto, HttpStatusCode.valueOf(201));
     }
@@ -89,4 +89,34 @@ public class BoardService {
         return (float) average.getAsDouble();
     }
 
+    @Transactional
+    public ResponseEntity<?> modifyBoard(Long memberId, BoardModifyDto boardModifyDto, Long boardId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Board board = boardRepository.findById(boardId).orElseThrow();
+
+        if (member.getMemberRole() == MemberRole.CUSTOMER){
+            board.modify(boardModifyDto.getMarket_name(), boardModifyDto.getShop_name(),
+                    boardModifyDto.getContent(), boardModifyDto.getRating());
+            // 고객의 경우 가게의 평균 별점 업데이트
+            board.getShop().updateRating(getLatestAverageRating(board.getShop()));
+        }
+        else {
+            board.modify(boardModifyDto.getMarket_name(), boardModifyDto.getShop_name(),
+                    boardModifyDto.getContent());
+        }
+
+        boardPhotoRepository.deleteAllByBoard(board);
+        purchasedProductRepository.deleteAllByBoard(board);
+
+        boardModifyDto.getPhoto().stream()  // boardPhoto 저장
+                        .map(photo -> BoardPhoto.builder().board(board).image(photo).build())
+                                .forEach(boardPhotoRepository::save);
+
+        boardModifyDto.getPurchased_products().stream()  // purchasedProducts 저장
+                .map(product_id -> BoardPurchasedProduct.builder().board(board)
+                        .product(productRepository.findById(Long.valueOf(product_id)).orElseThrow()).build())
+                .forEach(purchasedProductRepository::save);
+
+        return new ResponseEntity<BoardModifyDto>(boardModifyDto, HttpStatusCode.valueOf(200));
+    }
 }
