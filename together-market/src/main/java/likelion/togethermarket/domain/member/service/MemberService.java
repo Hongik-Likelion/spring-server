@@ -7,12 +7,11 @@ import likelion.togethermarket.domain.market.repository.MarketRepository;
 import likelion.togethermarket.domain.market.repository.WishMarketRepository;
 import likelion.togethermarket.domain.member.dto.request.CustomerModifyReqDto;
 import likelion.togethermarket.domain.member.dto.request.OwnerModifyReqDto;
-import likelion.togethermarket.domain.member.dto.response.CustomerInfoResDto;
-import likelion.togethermarket.domain.member.dto.response.ModifyResDto;
-import likelion.togethermarket.domain.member.dto.response.OwnerInfoResDto;
-import likelion.togethermarket.domain.member.dto.response.OwnerMarketDto;
+import likelion.togethermarket.domain.member.dto.response.*;
+import likelion.togethermarket.domain.member.entity.BlackList;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.member.entity.MemberRole;
+import likelion.togethermarket.domain.member.repository.BlackListRepository;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
@@ -20,16 +19,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final WishMarketRepository wishMarketRepository;
     private final MarketRepository marketRepository;
     private final ShopRepository shopRepository;
+    private final BlackListRepository blackListRepository;
 
     public ResponseEntity<?> getMemberInfo(Long memberId) {
 
@@ -75,7 +77,7 @@ public class MemberService {
         return new ResponseEntity<>(HttpStatusCode.valueOf(500));
     }
 
-
+    @Transactional
     public ResponseEntity<?> modifyCustomerInfo(Long memberId, CustomerModifyReqDto modifyRequestDto) {
         Member member = memberRepository.findById(memberId).orElseThrow();
 
@@ -98,6 +100,7 @@ public class MemberService {
         return new ResponseEntity<ModifyResDto>(modifyResDto, HttpStatusCode.valueOf(200));
     }
 
+    @Transactional
     public ResponseEntity<?> modifyOwnerInfo(Long memberId, OwnerModifyReqDto modifyRequestDto) {
         Member member = memberRepository.findById(memberId).orElseThrow();
 
@@ -117,5 +120,23 @@ public class MemberService {
                 .is_owner(true).build();
 
         return new ResponseEntity<ModifyResDto>(modifyResDto, HttpStatusCode.valueOf(200));
+    }
+
+    @Transactional
+    public ResponseEntity<?> blockUser(Long memberId, Long blockMemberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member blockingMember = memberRepository.findById(blockMemberId).orElseThrow();
+
+        BlackList blackList = BlackList.builder().member(member).blockedUserId(blockMemberId).build();
+        blackListRepository.save(blackList);
+
+        BlackResDto resDto = BlackResDto.builder().id(Math.toIntExact(memberId))
+                .email(member.getEmail())
+                .nickname(member.getNickName())
+                .profile(member.getProfile())
+                .introduction(member.getIntroduction())
+                .is_owner(member.getMemberRole() != MemberRole.CUSTOMER).build();
+
+        return new ResponseEntity<BlackResDto>(resDto, HttpStatusCode.valueOf(200));
     }
 }
