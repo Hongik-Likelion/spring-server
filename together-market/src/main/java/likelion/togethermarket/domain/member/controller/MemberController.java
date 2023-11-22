@@ -25,21 +25,19 @@ public class MemberController {
     }
 
     @PatchMapping("/modify")
-    public ResponseEntity<?> modifyCustomerMyInfo(
+    public ResponseEntity<?> modifyMyInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody CustomerModifyReqDto modifyRequestDto
+            @RequestBody Object modifyRequestDto
     ){
         Long memberId = customUserDetails.getMember().getId();
-        return memberService.modifyCustomerInfo(memberId, modifyRequestDto);
-    }
 
-    @PatchMapping("/modify")
-    public ResponseEntity<?> modifyOwnerMyInfo(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody OwnerModifyReqDto modifyRequestDto
-    ){
-        Long memberId = customUserDetails.getMember().getId();
-        return memberService.modifyOwnerInfo(memberId, modifyRequestDto);
+        if (modifyRequestDto instanceof CustomerModifyReqDto){
+            return memberService.modifyCustomerInfo(memberId, (CustomerModifyReqDto) modifyRequestDto);
+        } else if (modifyRequestDto instanceof  OwnerModifyReqDto) {
+            return memberService.modifyOwnerInfo(memberId, (OwnerModifyReqDto) modifyRequestDto);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PatchMapping("/{user_id}/block")
