@@ -47,12 +47,20 @@ public class ShopController {
         return shopService.deleteWishShop(memberId, shopId);
     }
 
-    // 시장에 존재하는 모든 가게 조회
+
     @GetMapping("")
     public ResponseEntity<?> searchAllShopInMarket(
-            @RequestParam("market_id") Long market_id
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam(value = "market_id", required = false) Long market_id
     ){
-        return shopService.showAllShop(market_id);
+        if (market_id != null){
+            // 시장에 존재하는 모든 가게 조회
+            return shopService.showAllShop(market_id);
+        } else {
+            // 나의 관심가게 조회
+            Long memberId = customUserDetails.getMember().getId();
+            return shopService.searchWishShop(memberId);
+        }
     }
 
     // 상점 조회
@@ -61,15 +69,6 @@ public class ShopController {
             @PathVariable("shop_id") Long shopId
     ){
         return shopService.searchDetail(shopId);
-    }
-
-    // 나의 관심가게 조회
-    @GetMapping("")
-    public ResponseEntity<?> showMyFavouriteShops(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ){
-        Long memberId = customUserDetails.getMember().getId();
-        return shopService.searchWishShop(memberId);
     }
 
 }
