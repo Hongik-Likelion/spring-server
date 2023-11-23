@@ -2,10 +2,8 @@ package likelion.togethermarket.domain.board.service;
 
 import likelion.togethermarket.domain.board.dto.BoardModifyDto;
 import likelion.togethermarket.domain.board.dto.BoardRegisterDto;
-import likelion.togethermarket.domain.board.dto.boardListDto.BoardInfoDto;
-import likelion.togethermarket.domain.board.dto.boardListDto.FinalBoardListDto;
-import likelion.togethermarket.domain.board.dto.boardListDto.MemberInfoDto;
-import likelion.togethermarket.domain.board.dto.boardListDto.ShopInfoDto;
+import likelion.togethermarket.domain.board.dto.SingleFinalDto;
+import likelion.togethermarket.domain.board.dto.boardListDto.*;
 import likelion.togethermarket.domain.board.entity.Board;
 import likelion.togethermarket.domain.board.entity.BoardPhoto;
 import likelion.togethermarket.domain.board.entity.BoardPurchasedProduct;
@@ -154,7 +152,7 @@ public class BoardService {
         }
         boards.removeAll(boardsToRemove);  // 조회 x 명단 제거
 
-        List<FinalBoardListDto> boardListDtos = new ArrayList<>();  // 반환할 최종 DTO 빌드
+        List<FinalBoardDto> boardListDtos = new ArrayList<>();  // 반환할 최종 DTO 빌드
         for (Board board : boards){
             List<BoardPhoto> boardPhotos = boardPhotoRepository.findAllByBoard(board);
             long likeCount = likeRepository.countByBoard(board);
@@ -168,11 +166,41 @@ public class BoardService {
 
             ShopInfoDto shopInfoDto = ShopInfoDto.builder().board(board).build();// shop_info 생성
 
-            FinalBoardListDto listDto = FinalBoardListDto.builder().user_info(memberInfoDto)
+            FinalBoardDto listDto = FinalBoardDto.builder().user_info(memberInfoDto)
                     .shop_info(shopInfoDto).board_info(boardInfoDto).build();
             boardListDtos.add(listDto);
         }
 
-        return new ResponseEntity<List<FinalBoardListDto>>(boardListDtos, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<List<FinalBoardDto>>(boardListDtos, HttpStatusCode.valueOf(200));
+    }
+
+    public ResponseEntity<?> getSingleBoard(Long boardId, Long memberId) {
+        Member reqMember = memberRepository.findById(memberId).orElseThrow();
+        Board board = boardRepository.findById(boardId).orElseThrow();
+
+        if (reportRepository.countByBoard(board) < 4L){  // 신고누적이 4이상이면 오류 반환
+            return new ResponseEntity<String>("It is reported board", HttpStatusCode.valueOf(400));
+        } else if (blackListRepository.existsByMemberAndBlockedUserId(reqMember, board.getMember().getId())){
+            // 사용중인 유저가 블럭한 유저면 오류 반환
+            return new ResponseEntity<String>("It is blocked User", HttpStatusCode.valueOf(400));
+        }
+
+        List<BoardPhoto> boardPhotos = boardPhotoRepository.findAllByBoard(board);
+        long likeCount = likeRepository.countByBoard(board);
+
+        BoardInfoDetailDto boardInfoDetailDto = BoardInfoDetailDto.builder().board(board)   // board_info 생성
+                .is_liked(likeRepository.existsByBoardAndMember(board, reqMember))
+                .like_count((int) likeCount)
+                .photo(boardPhotos.isEmpty() ? null : boardPhotos.stream()
+                        .map(BoardPhoto::getImage).toList()).build();
+
+        MemberInfoDto memberInfoDto = MemberInfoDto.builder().board(board).build();// user_info 생성
+
+        ShopInfoDto shopInfoDto = ShopInfoDto.builder().board(board).build();// shop_info 생성
+
+        SingleFinalDto finalBoardDto = SingleFinalDto.builder().user_info(memberInfoDto) // 최종 DTO 생성
+                .shop_info(shopInfoDto).board_info(boardInfoDetailDto).build();
+
+        return new ResponseEntity<SingleFinalDto>(finalBoardDto, HttpStatusCode.valueOf(200));
     }
 }
