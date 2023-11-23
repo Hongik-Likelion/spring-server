@@ -55,4 +55,15 @@ public class BoardController {
         return boardService.getBoardList(memberId, market_id);
     }
 
+    // 게시글 단일 조회
+    @GetMapping("/{board_id}")
+    public ResponseEntity<?> getSingleBoardInfo(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("board_id") Long boardId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.getSingleBoard(boardId, memberId);
+
+    }
+
 }
