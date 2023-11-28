@@ -1,8 +1,6 @@
 package likelion.togethermarket.domain.board.service;
 
-import likelion.togethermarket.domain.board.dto.BoardModifyDto;
-import likelion.togethermarket.domain.board.dto.BoardRegisterDto;
-import likelion.togethermarket.domain.board.dto.SingleFinalDto;
+import likelion.togethermarket.domain.board.dto.*;
 import likelion.togethermarket.domain.board.dto.boardListDto.*;
 import likelion.togethermarket.domain.board.entity.Board;
 import likelion.togethermarket.domain.board.entity.BoardPhoto;
@@ -16,6 +14,7 @@ import likelion.togethermarket.domain.member.entity.MemberRole;
 import likelion.togethermarket.domain.member.repository.BlackListRepository;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
 import likelion.togethermarket.domain.product.repository.ProductRepository;
+import likelion.togethermarket.domain.shop.dto.response.SimpleShopResDto;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -159,7 +159,7 @@ public class BoardService {
 
             BoardInfoDto boardInfoDto = BoardInfoDto.builder().board(board)   // board_info 생성
                     .is_liked(likeRepository.existsByBoardAndMember(board, reqMember))
-                    .like_count((int) likeCount)
+                    .like_count((int) likeCount)  // photo가 없으면 null 설정
                     .photo(boardPhotos.isEmpty() ? null : boardPhotos.get(0).getImage()).build();
 
             MemberInfoDto memberInfoDto = MemberInfoDto.builder().board(board).build();// user_info 생성
@@ -174,6 +174,7 @@ public class BoardService {
         return new ResponseEntity<List<FinalBoardDto>>(boardListDtos, HttpStatusCode.valueOf(200));
     }
 
+    // 단일 게시글 조회 메서드
     public ResponseEntity<?> getSingleBoard(Long boardId, Long memberId) {
         Member reqMember = memberRepository.findById(memberId).orElseThrow();
         Board board = boardRepository.findById(boardId).orElseThrow();
@@ -202,5 +203,25 @@ public class BoardService {
                 .shop_info(shopInfoDto).board_info(boardInfoDetailDto).build();
 
         return new ResponseEntity<SingleFinalDto>(finalBoardDto, HttpStatusCode.valueOf(200));
+    }
+
+    // 내가 쓴 모든 글을 조회하는 메서드
+    public ResponseEntity<?> getMyBoard(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        List<Board> boards = boardRepository.findAllByMember(member);
+
+        List<MyBoardResDto> resDtos = boards.stream()
+                .map(board -> MyBoardResDto.builder()
+                        .shop_info(SimpleShopResDto
+                                .builder()
+                                .shop(board.getShop())
+                                .build())
+                        .board_info(MyBoardInfoDto
+                                .builder()
+                                .board(board)
+                                .boardPhotos(boardPhotoRepository.findAllByBoard(board)).build())
+                        .build()).toList();
+
+        return new ResponseEntity<List<MyBoardResDto>>(resDtos, HttpStatusCode.valueOf(200));
     }
 }
