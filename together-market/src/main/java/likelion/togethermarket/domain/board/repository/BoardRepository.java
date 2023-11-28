@@ -2,6 +2,7 @@ package likelion.togethermarket.domain.board.repository;
 
 import likelion.togethermarket.domain.board.entity.Board;
 import likelion.togethermarket.domain.market.entity.Market;
+import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     List<Board> findAllByShop(Shop shop);
 
     List<Board> findAllByMarket(Market market);
+
+    List<Board> findAllByMember(Member member);
 }

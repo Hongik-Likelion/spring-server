@@ -13,4 +13,5 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
     Optional<Shop> findByMember(Member member);
 
     List<Shop> findAllByMarket(Market market);
+
 }
