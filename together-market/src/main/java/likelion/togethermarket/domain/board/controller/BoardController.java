@@ -70,6 +70,7 @@ public class BoardController {
         return boardService.getSingleBoard(boardId, memberId);
     }
 
+    // 내 가게에 대한 리뷰 조회
     @GetMapping("/review")
     public ResponseEntity<?> getShopReviews(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -78,6 +79,7 @@ public class BoardController {
         return boardService.getMyShopReview(memberId);
     }
 
+    // 좋아요
     @PatchMapping("/{board_id}/like")
     public ResponseEntity<?> likeToBoard(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -87,6 +89,7 @@ public class BoardController {
         return boardService.likeBoard(memberId, boardId);
     }
 
+    // 좋아요 취소
     @PatchMapping("/{board_id}/unlike")
     public ResponseEntity<?> cancelMyLike(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -94,6 +97,16 @@ public class BoardController {
     ){
         Long memberId = customUserDetails.getMember().getId();
         return boardService.cancelLike(memberId, boardId);
+    }
+
+    // 게시글 신고하기
+    @PatchMapping("/{board_id}/report")
+    public ResponseEntity<?> reportBoard(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("board_id") Long boardId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.report(memberId, boardId);
     }
 
 }
