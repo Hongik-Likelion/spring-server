@@ -2,10 +2,7 @@ package likelion.togethermarket.domain.board.service;
 
 import likelion.togethermarket.domain.board.dto.*;
 import likelion.togethermarket.domain.board.dto.boardListDto.*;
-import likelion.togethermarket.domain.board.entity.Board;
-import likelion.togethermarket.domain.board.entity.BoardPhoto;
-import likelion.togethermarket.domain.board.entity.BoardPurchasedProduct;
-import likelion.togethermarket.domain.board.entity.Like;
+import likelion.togethermarket.domain.board.entity.*;
 import likelion.togethermarket.domain.board.repository.*;
 import likelion.togethermarket.domain.market.entity.Market;
 import likelion.togethermarket.domain.market.repository.MarketRepository;
@@ -279,5 +276,14 @@ public class BoardService {
         return new ResponseEntity<String>("좋아요 취소", HttpStatusCode.valueOf(200));
     }
 
+    // 게시글 신고
+    public ResponseEntity<?> report(Long memberId, Long boardId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Board board = boardRepository.findById(boardId).orElseThrow();
 
+        Report report = Report.builder().board(board).member(member).build();
+        reportRepository.save(report);
+
+        return new ResponseEntity<String>("신고 성공", HttpStatusCode.valueOf(200));
+    }
 }
