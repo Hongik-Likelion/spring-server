@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import likelion.togethermarket.domain.member.entity.Member;
 import likelion.togethermarket.global.common.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,10 @@ public class Report extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
+
+    @Builder
+    public Report(Member member, Board board) {
+        this.member = member;
+        this.board = board;
+    }
 }

@@ -2,9 +2,7 @@ package likelion.togethermarket.domain.board.service;
 
 import likelion.togethermarket.domain.board.dto.*;
 import likelion.togethermarket.domain.board.dto.boardListDto.*;
-import likelion.togethermarket.domain.board.entity.Board;
-import likelion.togethermarket.domain.board.entity.BoardPhoto;
-import likelion.togethermarket.domain.board.entity.BoardPurchasedProduct;
+import likelion.togethermarket.domain.board.entity.*;
 import likelion.togethermarket.domain.board.repository.*;
 import likelion.togethermarket.domain.market.entity.Market;
 import likelion.togethermarket.domain.market.repository.MarketRepository;
@@ -255,5 +253,37 @@ public class BoardService {
 
         // 신고당한 리뷰나, 블럭한 유저의 리뷰도 볼 수 있음
         return new ResponseEntity<List<ReviewDto>>(reviewDtos, HttpStatusCode.valueOf(200));
+    }
+
+    // 게시글 좋아요
+    public ResponseEntity<?> likeBoard(Long memberId, Long boardId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Board board = boardRepository.findById(boardId).orElseThrow();
+
+        likeRepository.save(Like.builder().board(board).member(member).build());
+
+        return new ResponseEntity<String>("좋아요 성공", HttpStatusCode.valueOf(201));
+    }
+
+    // 게시글 좋아요 취소
+    public ResponseEntity<?> cancelLike(Long memberId, Long boardId){
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Board board = boardRepository.findById(boardId).orElseThrow();
+
+        Like myLike = likeRepository.findByMemberAndBoard(member, board).orElseThrow();
+        likeRepository.delete(myLike);
+
+        return new ResponseEntity<String>("좋아요 취소", HttpStatusCode.valueOf(200));
+    }
+
+    // 게시글 신고
+    public ResponseEntity<?> report(Long memberId, Long boardId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Board board = boardRepository.findById(boardId).orElseThrow();
+
+        Report report = Report.builder().board(board).member(member).build();
+        reportRepository.save(report);
+
+        return new ResponseEntity<String>("신고 성공", HttpStatusCode.valueOf(200));
     }
 }
