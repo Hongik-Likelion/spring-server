@@ -78,4 +78,22 @@ public class BoardController {
         return boardService.getMyShopReview(memberId);
     }
 
+    @PatchMapping("/{board_id}/like")
+    public ResponseEntity<?> likeToBoard(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("board_id") Long boardId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.likeBoard(memberId, boardId);
+    }
+
+    @PatchMapping("/{board_id}/unlike")
+    public ResponseEntity<?> cancelMyLike(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("board_id") Long boardId
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.cancelLike(memberId, boardId);
+    }
+
 }
