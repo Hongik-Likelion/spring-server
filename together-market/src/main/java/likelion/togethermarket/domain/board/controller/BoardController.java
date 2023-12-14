@@ -68,7 +68,14 @@ public class BoardController {
     ){
         Long memberId = customUserDetails.getMember().getId();
         return boardService.getSingleBoard(boardId, memberId);
+    }
 
+    @GetMapping("/review")
+    public ResponseEntity<?> getShopReviews(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ){
+        Long memberId = customUserDetails.getMember().getId();
+        return boardService.getMyShopReview(memberId);
     }
 
 }
