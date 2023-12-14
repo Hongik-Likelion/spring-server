@@ -23,9 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -223,5 +222,38 @@ public class BoardService {
                         .build()).toList();
 
         return new ResponseEntity<List<MyBoardResDto>>(resDtos, HttpStatusCode.valueOf(200));
+    }
+
+    // 사장이 본인 가게의 모든 리뷰를 조회할 수 있는 서비스
+    public ResponseEntity<?> getMyShopReview(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Shop shop = shopRepository.findByMember(member).orElseThrow();
+        List<Board> boards = boardRepository.findAllByShop(shop);
+
+        // 손님이 작성한 리뷰 게시글만 필터
+        List<Board> reviews = boards.stream()
+                .filter(board -> board.getMember().getMemberRole() == MemberRole.CUSTOMER)
+                .toList();
+
+        List<ReviewDto> reviewDtos = new ArrayList<>();
+        for (Board review : reviews){
+            List<BoardPhoto> boardPhotos = boardPhotoRepository.findAllByBoard(review);
+            long likeCount = likeRepository.countByBoard(review);
+
+            ReviewBoardInfoDto reviewBoardInfoDto = ReviewBoardInfoDto.builder().board(review)   // board_info 생성
+                    .is_liked(likeRepository.existsByBoardAndMember(review, member))
+                    .like_count((int) likeCount)
+                    // photo가 없으면 null 설정
+                    .photo(boardPhotos.isEmpty() ? null : boardPhotos.get(0).getImage()).build();
+
+            ReviewUserDto reviewUserDto = ReviewUserDto.builder().member(member).build();// user_info 생성
+
+            ReviewDto reviewDto = ReviewDto.builder().user_info(reviewUserDto)
+                    .board_info(reviewBoardInfoDto).build();
+            reviewDtos.add(reviewDto);
+        }
+
+        // 신고당한 리뷰나, 블럭한 유저의 리뷰도 볼 수 있음
+        return new ResponseEntity<List<ReviewDto>>(reviewDtos, HttpStatusCode.valueOf(200));
     }
 }
