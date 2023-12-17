@@ -1,6 +1,7 @@
 package likelion.togethermarket.domain.member.controller;
 
 import likelion.togethermarket.domain.member.dto.request.CustomerModifyReqDto;
+import likelion.togethermarket.domain.member.dto.request.ModifyReq;
 import likelion.togethermarket.domain.member.dto.request.OwnerModifyReqDto;
 import likelion.togethermarket.domain.member.service.MemberService;
 import likelion.togethermarket.global.jwt.CustomUserDetails;
@@ -27,17 +28,10 @@ public class MemberController {
     @PatchMapping("/modify")
     public ResponseEntity<?> modifyMyInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody Object modifyRequestDto
+            @RequestBody ModifyReq modifyRequestDto
     ){
         Long memberId = customUserDetails.getMember().getId();
-
-        if (modifyRequestDto instanceof CustomerModifyReqDto){
-            return memberService.modifyCustomerInfo(memberId, (CustomerModifyReqDto) modifyRequestDto);
-        } else if (modifyRequestDto instanceof  OwnerModifyReqDto) {
-            return memberService.modifyOwnerInfo(memberId, (OwnerModifyReqDto) modifyRequestDto);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+        return memberService.modifyInfo(memberId, modifyRequestDto);
     }
 
     @PatchMapping("/{user_id}/block")
