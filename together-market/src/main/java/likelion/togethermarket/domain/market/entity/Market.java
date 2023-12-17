@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Market extends BaseTimeEntity {
+public class Market {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "market_id")
     private Long id;
