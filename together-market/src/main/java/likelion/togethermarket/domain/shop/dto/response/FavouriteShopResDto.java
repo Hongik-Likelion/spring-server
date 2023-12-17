@@ -3,6 +3,7 @@ package likelion.togethermarket.domain.shop.dto.response;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @Getter
 @NoArgsConstructor
@@ -13,7 +14,9 @@ public class FavouriteShopResDto {
     private String opening_time;
     private String closing_time;
     private String opening_frequency;
-    private float average_rating;
+
+    @Nullable
+    private Float average_rating;
     private boolean is_liked;
 
     public FavouriteShopResDto(Shop shop) {
