@@ -6,7 +6,6 @@ import likelion.togethermarket.domain.market.entity.WishMarket;
 import likelion.togethermarket.domain.market.repository.MarketRepository;
 import likelion.togethermarket.domain.market.repository.WishMarketRepository;
 import likelion.togethermarket.domain.member.dto.request.CustomerModifyReqDto;
-import likelion.togethermarket.domain.member.dto.request.ModifyReq;
 import likelion.togethermarket.domain.member.dto.request.OwnerModifyReqDto;
 import likelion.togethermarket.domain.member.dto.response.*;
 import likelion.togethermarket.domain.member.entity.BlackList;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -82,7 +82,7 @@ public class MemberService {
 
     //회원정보 수정
     @Transactional
-    public ResponseEntity<?> modifyInfo(Long memberId, ModifyReq modifyReq){
+    public ResponseEntity<?> modifyInfo(Long memberId, Map<String, Object> modifyReq){
 
         Member member = memberRepository.findById(memberId).orElseThrow();
 

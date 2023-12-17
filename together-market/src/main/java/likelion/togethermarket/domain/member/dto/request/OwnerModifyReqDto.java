@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Getter
 @NoArgsConstructor
 public class OwnerModifyReqDto {
@@ -13,10 +15,10 @@ public class OwnerModifyReqDto {
     private String closing_time;
 
     @Builder
-    public OwnerModifyReqDto(ModifyReq modifyReq) {
-        this.shop_name = (String) modifyReq.getData().get("shop_name");
-        this.introduction = (String) modifyReq.getData().get("introduction");
-        this.opening_time = (String) modifyReq.getData().get("opening_time");
-        this.closing_time = (String) modifyReq.getData().get("closing_time");
+    public OwnerModifyReqDto(Map<String, Object> modifyReq) {
+        this.shop_name = (String) modifyReq.get("shop_name");
+        this.introduction = (String) modifyReq.get("introduction");
+        this.opening_time = (String) modifyReq.get("opening_time");
+        this.closing_time = (String) modifyReq.get("closing_time");
     }
 }

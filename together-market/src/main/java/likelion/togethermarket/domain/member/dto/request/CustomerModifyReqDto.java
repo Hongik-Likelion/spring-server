@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor
@@ -14,9 +15,9 @@ public class CustomerModifyReqDto {
     private String introduction;
 
     @Builder
-    public CustomerModifyReqDto(ModifyReq modifyReq) {
-        this.nickname = (String) modifyReq.getData().get("nickname");
-        this.favourite_markets = (List<Integer>) modifyReq.getData().get("favourite_markets");
-        this.introduction = (String) modifyReq.getData().get("introduction");
+    public CustomerModifyReqDto(Map<String, Object> modifyReq) {
+        this.nickname = (String) modifyReq.get("nickname");
+        this.favourite_markets = (List<Integer>) modifyReq.get("favourite_markets");
+        this.introduction = (String) modifyReq.get("introduction");
     }
 }

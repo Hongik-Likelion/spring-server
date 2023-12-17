@@ -1,8 +1,8 @@
 package likelion.togethermarket.domain.member.controller;
 
 import likelion.togethermarket.domain.member.dto.request.CustomerModifyReqDto;
-import likelion.togethermarket.domain.member.dto.request.ModifyReq;
 import likelion.togethermarket.domain.member.dto.request.OwnerModifyReqDto;
+import likelion.togethermarket.domain.member.entity.MemberRole;
 import likelion.togethermarket.domain.member.service.MemberService;
 import likelion.togethermarket.global.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,10 +30,10 @@ public class MemberController {
     @PatchMapping("/modify")
     public ResponseEntity<?> modifyMyInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody ModifyReq modifyRequestDto
+            @RequestBody Map<String, Object> reqBody
     ){
         Long memberId = customUserDetails.getMember().getId();
-        return memberService.modifyInfo(memberId, modifyRequestDto);
+        return memberService.modifyInfo(memberId, reqBody);
     }
 
     @PatchMapping("/{user_id}/block")
