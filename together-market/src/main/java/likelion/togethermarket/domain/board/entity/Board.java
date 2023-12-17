@@ -44,7 +44,7 @@ public class Board extends BaseTimeEntity {
 
     @Nullable
     @Column(name = "rating")
-    private int rating;
+    private Integer rating;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardPhoto> photos;

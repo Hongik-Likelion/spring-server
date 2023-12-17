@@ -61,7 +61,7 @@ public class Shop extends BaseTimeEntity {
         this.closingTime = newClosing;
     }
 
-    public void updateRating(float newRating){
+    public void updateRating(Float newRating){
         this.rating = newRating;
     }
 

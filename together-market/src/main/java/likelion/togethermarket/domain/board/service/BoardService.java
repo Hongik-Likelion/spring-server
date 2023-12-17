@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +57,7 @@ public class BoardService {
                     .content(boardRegisterDto.getContent())
                     .build();
             shop.updateRating(getLatestAverageRating(shop)); // 평균 별점 업데이트
+            shopRepository.save(shop);
         }
         else {
             board = Board.builder().member(member)  //board 저장, Owner 일때 (rating 없음)
@@ -84,11 +84,19 @@ public class BoardService {
         return new ResponseEntity<BoardRegisterDto>(boardRegisterDto, HttpStatusCode.valueOf(201));
     }
 
-    public float getLatestAverageRating(Shop shop){
+    public Float getLatestAverageRating(Shop shop){
         List<Board> boardList = boardRepository.findAllByShop(shop);
-        OptionalDouble average = boardList.stream()
-                .mapToInt(Board::getRating).average();
-        return (float) average.getAsDouble();
+        if (boardList.isEmpty()){
+            return null;
+        }
+        else {
+            OptionalDouble average = boardList.stream()
+                    .filter(board -> board.getRating() != null)
+                    .mapToDouble(Board::getRating)
+                    .average();
+
+            return (float) average.orElse(0.0);
+        }
     }
 
     @Transactional
@@ -123,6 +131,7 @@ public class BoardService {
     }
 
     // 게시글 삭제
+    @Transactional
     public ResponseEntity<?> deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow();
         boardRepository.delete(board);
@@ -176,7 +185,7 @@ public class BoardService {
         Member reqMember = memberRepository.findById(memberId).orElseThrow();
         Board board = boardRepository.findById(boardId).orElseThrow();
 
-        if (reportRepository.countByBoard(board) < 4L){  // 신고누적이 4이상이면 오류 반환
+        if (reportRepository.countByBoard(board) > 4L){  // 신고누적이 4이상이면 오류 반환
             return new ResponseEntity<String>("It is reported board", HttpStatusCode.valueOf(400));
         } else if (blackListRepository.existsByMemberAndBlockedUserId(reqMember, board.getMember().getId())){
             // 사용중인 유저가 블럭한 유저면 오류 반환
@@ -256,6 +265,7 @@ public class BoardService {
     }
 
     // 게시글 좋아요
+    @Transactional
     public ResponseEntity<?> likeBoard(Long memberId, Long boardId) {
         Member member = memberRepository.findById(memberId).orElseThrow();
         Board board = boardRepository.findById(boardId).orElseThrow();
@@ -266,6 +276,7 @@ public class BoardService {
     }
 
     // 게시글 좋아요 취소
+    @Transactional
     public ResponseEntity<?> cancelLike(Long memberId, Long boardId){
         Member member = memberRepository.findById(memberId).orElseThrow();
         Board board = boardRepository.findById(boardId).orElseThrow();
@@ -277,6 +288,7 @@ public class BoardService {
     }
 
     // 게시글 신고
+    @Transactional
     public ResponseEntity<?> report(Long memberId, Long boardId) {
         Member member = memberRepository.findById(memberId).orElseThrow();
         Board board = boardRepository.findById(boardId).orElseThrow();
