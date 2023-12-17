@@ -20,7 +20,7 @@ public class JwtTokenProvider {
     private final String key;
     private final MemberRepository memberRepository;
 
-    private Long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30L; //30분
+    private Long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7L; //7일, 테스트를 위해 7일로 만료시간 설정
     private Long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7L; //7일
 
     @Autowired
