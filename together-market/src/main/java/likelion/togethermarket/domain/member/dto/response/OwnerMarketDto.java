@@ -6,6 +6,7 @@ import likelion.togethermarket.domain.shop.entity.Shop;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,7 +29,8 @@ public class OwnerMarketDto {
         this.opening_time = shop.getOpeningTime();
         this.closing_time = shop.getClosingTime();
         this.opening_frequency = shop.getOpeningFrequency();
-        this.product_categories = (List<Integer>) shop.getProducts().stream()
-                .map(SellingProducts::getId).toList().stream().mapToInt(Long::intValue);
+        this.product_categories = shop.getProducts().stream()
+                .map(SellingProducts::getId).map(Long::intValue)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 }
