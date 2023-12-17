@@ -29,4 +29,8 @@ public class FavouriteShopResDto {
         this.average_rating = shop.getRating();
         this.is_liked = true;
     }
+
+    public boolean getIs_liked(){
+        return is_liked;
+    }
 }

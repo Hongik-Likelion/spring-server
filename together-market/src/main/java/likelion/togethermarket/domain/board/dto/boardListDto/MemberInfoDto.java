@@ -21,4 +21,8 @@ public class MemberInfoDto {
         this.nickname = board.getMember().getNickName();
         this.profile = board.getMember().getProfile();
     }
+
+    public boolean getIs_owner(){
+        return is_owner;
+    }
 }

@@ -32,4 +32,8 @@ public class BoardInfoDto {
         this.like_count = like_count;
         this.is_liked = is_liked;
     }
+
+    public boolean getIs_liked(){
+        return is_liked;
+    }
 }

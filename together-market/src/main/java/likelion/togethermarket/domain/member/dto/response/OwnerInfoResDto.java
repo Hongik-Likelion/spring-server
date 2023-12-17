@@ -26,4 +26,8 @@ public class OwnerInfoResDto {
         this.is_owner = is_owner;
         this.market = market;
     }
+
+    public boolean getIs_owner(){
+        return is_owner;
+    }
 }

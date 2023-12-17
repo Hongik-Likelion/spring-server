@@ -30,4 +30,8 @@ public class CustomerInfoResDto {
         this.is_owner = is_owner;
         this.favourite_markets = favourite_markets;
     }
+
+    public boolean getIs_owner(){
+        return is_owner;
+    }
 }

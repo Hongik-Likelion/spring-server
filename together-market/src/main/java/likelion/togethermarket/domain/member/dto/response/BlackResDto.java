@@ -23,4 +23,8 @@ public class BlackResDto {
         this.introduction = introduction;
         this.is_owner = is_owner;
     }
+
+    public boolean getIs_owner(){
+        return is_owner;
+    }
 }
