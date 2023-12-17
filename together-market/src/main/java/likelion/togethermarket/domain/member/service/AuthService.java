@@ -1,5 +1,7 @@
 package likelion.togethermarket.domain.member.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import likelion.togethermarket.domain.member.dto.request.LoginDto;
 import likelion.togethermarket.domain.member.dto.request.ReissueDto;
 import likelion.togethermarket.domain.member.dto.request.SignupDto;
@@ -8,7 +10,7 @@ import likelion.togethermarket.domain.member.entity.MemberRole;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
 import likelion.togethermarket.global.jwt.JwtTokenDto;
 import likelion.togethermarket.global.jwt.JwtTokenProvider;
-import likelion.togethermarket.global.redis.RedisService;
+//import likelion.togethermarket.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ import java.util.Optional;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider tokenProvider;
-    private final RedisService redisService;
+//    private final RedisService redisService;
 
     public ResponseEntity<?> signupMember(SignupDto signupDto) {
         Optional<Member> byEmail = memberRepository.findByEmail(signupDto.getEmail());
@@ -43,7 +45,7 @@ public class AuthService {
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
 
         // refreshToken 을 redis를 이용해 저장
-        redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
+//        redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
         return new ResponseEntity<JwtTokenDto>(jwtTokenDto, HttpStatus.CREATED);
     }
 
@@ -54,7 +56,7 @@ public class AuthService {
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
 
         // refreshToken 을 redis를 이용해 저장
-        redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
+//        redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
         return new ResponseEntity<JwtTokenDto>(jwtTokenDto, HttpStatus.ACCEPTED);
     }
 
@@ -63,17 +65,18 @@ public class AuthService {
         String refreshToken = reissueDto.getRefreshToken();
 
         // refreshToken 이 Deprecated거나 유효하지 않으면 badRequest 반환
-        if (redisService.getValue(refreshToken) == "Deprecated" || !tokenProvider.validateToken(refreshToken)){
+        // redisService.getValue(refreshToken) == "Deprecated"
+        if (!tokenProvider.validateToken(refreshToken)){
             return ResponseEntity.badRequest().build();
         }
 
-        Long memberId = Long.valueOf(redisService.getValue(refreshToken));
+        Long memberId = tokenProvider.getMemberId(refreshToken);
         Member member = memberRepository.findById(memberId).orElseThrow();
 
         // 원래 있던 refreshToken 은 Deprecated로 설정, 새로 발급된 refreshToken도 저장
         JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
-        redisService.setValue(refreshToken, "Deprecated", 1000 * 60 * 60 * 24 * 7L);
-        redisService.setValue(jwtTokenDto.getRefreshToken(), memberId.toString(), 1000 * 60 * 60 * 24 * 7L);
+//        redisService.setValue(refreshToken, "Deprecated", 1000 * 60 * 60 * 24 * 7L);
+//        redisService.setValue(jwtTokenDto.getRefreshToken(), memberId.toString(), 1000 * 60 * 60 * 24 * 7L);
 
         return new ResponseEntity<JwtTokenDto>(jwtTokenDto, HttpStatus.ACCEPTED);
     }

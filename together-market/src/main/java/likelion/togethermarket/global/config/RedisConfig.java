@@ -9,27 +9,27 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
-@EnableRedisRepositories
-public class RedisConfig {
-    @Value("${spring.data.redis.host}")
-    private String host;
-
-    @Value("${spring.data.redis.port}")
-    private Integer port;
-
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory(){
-        return new LettuceConnectionFactory(host, port);
-    }
-
-    // key, value 모두 문자열로 다루게 설정
-    @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        return redisTemplate;
-    }
-}
+//@Configuration
+//@EnableRedisRepositories
+//public class RedisConfig {
+//    @Value("${spring.data.redis.host}")
+//    private String host;
+//
+//    @Value("${spring.data.redis.port}")
+//    private Integer port;
+//
+//    @Bean
+//    public RedisConnectionFactory redisConnectionFactory(){
+//        return new LettuceConnectionFactory(host, port);
+//    }
+//
+//    // key, value 모두 문자열로 다루게 설정
+//    @Bean
+//    public RedisTemplate<String, String> redisTemplate() {
+//        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setKeySerializer(new StringRedisSerializer());
+//        redisTemplate.setValueSerializer(new StringRedisSerializer());
+//        redisTemplate.setConnectionFactory(redisConnectionFactory());
+//        return redisTemplate;
+//    }
+//}

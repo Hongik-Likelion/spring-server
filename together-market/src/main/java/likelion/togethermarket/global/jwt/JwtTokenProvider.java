@@ -44,6 +44,7 @@ public class JwtTokenProvider {
                 .sign(Algorithm.HMAC256(key));
 
         String refreshToken = JWT.create()
+                .withClaim("id", member.getId())
                 .withExpiresAt(new Date(date.getTime() + REFRESH_TOKEN_EXPIRE_TIME))
                 .sign(Algorithm.HMAC256(key));
 
@@ -73,5 +74,9 @@ public class JwtTokenProvider {
         } catch (JWTVerificationException e){
             throw e;
         }
+    }
+
+    public Long getMemberId(String token){
+        return JWT.require(Algorithm.HMAC256(key)).build().verify(token).getClaim("id").asLong();
     }
 }
