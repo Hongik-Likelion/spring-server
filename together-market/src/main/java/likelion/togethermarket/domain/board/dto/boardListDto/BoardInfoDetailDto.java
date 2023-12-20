@@ -12,6 +12,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class BoardInfoDetailDto {
+
+    private int board_id;
+
     private String updated_at;
 
     @Nullable
@@ -26,6 +29,7 @@ public class BoardInfoDetailDto {
 
     @Builder
     public BoardInfoDetailDto(Board board, List<String> photo, int like_count, boolean is_liked) {
+        this.board_id = board.getId().intValue();
         this.updated_at = board.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         this.rating = board.getRating();
         this.photo = photo;

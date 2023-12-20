@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @NoArgsConstructor
 public class BoardInfoDto {
+
+    private int board_id;
+
     private String updated_at;
 
     @Nullable
@@ -25,6 +28,7 @@ public class BoardInfoDto {
 
     @Builder
     public BoardInfoDto(Board board, String photo, int like_count, boolean is_liked) {
+        this.board_id = board.getId().intValue();
         this.updated_at = board.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         this.rating = board.getRating();
         this.photo = photo;
