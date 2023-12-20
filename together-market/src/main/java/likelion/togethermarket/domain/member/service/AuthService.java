@@ -51,9 +51,13 @@ public class AuthService {
 
 
     public ResponseEntity<?> loginMember(LoginDto loginDto) {
-        Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow();
+        Optional<Member> member = memberRepository.findByEmail(loginDto.getEmail());
 
-        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member);
+        if (member.isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+
+        JwtTokenDto jwtTokenDto = tokenProvider.generateToken(member.get());
 
         // refreshToken 을 redis를 이용해 저장
 //        redisService.setValue(jwtTokenDto.getRefreshToken(), member.getId().toString(), 1000 * 60 * 60 * 24 * 7L);
