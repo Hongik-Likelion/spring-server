@@ -15,6 +15,8 @@ import likelion.togethermarket.domain.product.repository.ProductRepository;
 import likelion.togethermarket.domain.shop.dto.response.SimpleShopResDto;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
+import likelion.togethermarket.global.exception.CustomException;
+import likelion.togethermarket.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,8 @@ public class BoardService {
 
     @Transactional
     public ResponseEntity<?> registerBoard(Long memberId, BoardRegisterDto boardRegisterDto) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Market market = marketRepository.findById((long) boardRegisterDto.getMarket_id()).orElseThrow();
         Shop shop = shopRepository.findById((long) boardRegisterDto.getShop_id()).orElseThrow();
 
@@ -101,7 +104,8 @@ public class BoardService {
 
     @Transactional
     public ResponseEntity<?> modifyBoard(Long memberId, BoardModifyDto boardModifyDto, Long boardId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Board board = boardRepository.findById(boardId).orElseThrow();
 
         if (member.getMemberRole() == MemberRole.CUSTOMER){
@@ -141,7 +145,8 @@ public class BoardService {
 
     // 시장 게시글 전체 조회
     public ResponseEntity<?> getBoardList(Long memberId, Long marketId) {
-        Member reqMember = memberRepository.findById(memberId).orElseThrow(); // 요청을 보낸 멤버
+        Member reqMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND)); // 요청을 보낸 멤버
         Market market = marketRepository.findById(marketId).orElseThrow();
         List<Board> boards = boardRepository.findAllByMarket(market);
 
@@ -182,7 +187,8 @@ public class BoardService {
 
     // 단일 게시글 조회 메서드
     public ResponseEntity<?> getSingleBoard(Long boardId, Long memberId) {
-        Member reqMember = memberRepository.findById(memberId).orElseThrow();
+        Member reqMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
         Board board = boardRepository.findById(boardId).orElseThrow();
 
         if (reportRepository.countByBoard(board) > 4L){  // 신고누적이 4이상이면 오류 반환
@@ -213,7 +219,8 @@ public class BoardService {
 
     // 내가 쓴 모든 글을 조회하는 메서드
     public ResponseEntity<?> getMyBoard(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
         List<Board> boards = boardRepository.findAllByMember(member);
 
         List<MyBoardResDto> resDtos = boards.stream()
@@ -233,7 +240,8 @@ public class BoardService {
 
     // 사장이 본인 가게의 모든 리뷰를 조회할 수 있는 서비스
     public ResponseEntity<?> getMyShopReview(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
         Shop shop = shopRepository.findByMember(member).orElseThrow();
         List<Board> boards = boardRepository.findAllByShop(shop);
 
@@ -267,8 +275,13 @@ public class BoardService {
     // 게시글 좋아요
     @Transactional
     public ResponseEntity<?> likeBoard(Long memberId, Long boardId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
         Board board = boardRepository.findById(boardId).orElseThrow();
+
+        if (likeRepository.existsByBoardAndMember(board, member)){
+            return new ResponseEntity<String>("이미 좋아요한 게시글", HttpStatusCode.valueOf(400));
+        }
 
         likeRepository.save(Like.builder().board(board).member(member).build());
 
@@ -278,7 +291,8 @@ public class BoardService {
     // 게시글 좋아요 취소
     @Transactional
     public ResponseEntity<?> cancelLike(Long memberId, Long boardId){
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
         Board board = boardRepository.findById(boardId).orElseThrow();
 
         Like myLike = likeRepository.findByMemberAndBoard(member, board).orElseThrow();
@@ -290,8 +304,13 @@ public class BoardService {
     // 게시글 신고
     @Transactional
     public ResponseEntity<?> report(Long memberId, Long boardId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
         Board board = boardRepository.findById(boardId).orElseThrow();
+
+        if (reportRepository.existsByBoardAndMember(board, member)){
+            return new ResponseEntity<String>("이미 신고한 게시글", HttpStatusCode.valueOf(400));
+        }
 
         Report report = Report.builder().board(board).member(member).build();
         reportRepository.save(report);

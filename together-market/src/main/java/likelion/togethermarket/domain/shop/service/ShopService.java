@@ -17,6 +17,8 @@ import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.entity.WishShop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
 import likelion.togethermarket.domain.shop.repository.WishShopRepository;
+import likelion.togethermarket.global.exception.CustomException;
+import likelion.togethermarket.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +41,8 @@ public class ShopService {
     // 새 가게 등록
     @Transactional
     public ResponseEntity<?> registerShop(Long memberId, ShopRegisterDto reqDto) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Market market = marketRepository.findById((long) reqDto.getMarket_id()).orElseThrow();
         List<Product> products = reqDto.getProduct_categories().stream().map(productId
                         -> productRepository.findById(Long.valueOf(productId)).orElseThrow())
@@ -67,7 +70,8 @@ public class ShopService {
     // 가게 즐겨찾기 등록
     @Transactional
     public ResponseEntity<?> registerWishShop(Long memberId, Long shopId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Shop shop = shopRepository.findById(shopId).orElseThrow();
         WishShop wishShop = WishShop.builder().shop(shop).member(member).build();
         wishShopRepository.save(wishShop);
@@ -80,7 +84,8 @@ public class ShopService {
     // 가게 즐겨찾기 삭제
     @Transactional
     public ResponseEntity<?> deleteWishShop(Long memberId, Long shopId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Shop shop = shopRepository.findById(shopId).orElseThrow();
         WishShop wishShop = wishShopRepository.findByMemberAndShop(member, shop).orElseThrow();
         wishShopRepository.delete(wishShop);
@@ -116,7 +121,8 @@ public class ShopService {
     }
 
     public ResponseEntity<?> searchWishShop(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         List<Shop> shops = wishShopRepository.findAllByMember(member).stream().map(WishShop::getShop).toList();
         List<FavouriteShopResDto> favouriteShopResDtos = shops.stream().map(FavouriteShopResDto::new).toList();
 

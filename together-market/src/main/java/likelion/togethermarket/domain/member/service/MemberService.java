@@ -15,6 +15,8 @@ import likelion.togethermarket.domain.member.repository.BlackListRepository;
 import likelion.togethermarket.domain.member.repository.MemberRepository;
 import likelion.togethermarket.domain.shop.entity.Shop;
 import likelion.togethermarket.domain.shop.repository.ShopRepository;
+import likelion.togethermarket.global.exception.CustomException;
+import likelion.togethermarket.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatusCode;
@@ -38,7 +40,8 @@ public class MemberService {
     public ResponseEntity<?> getMemberInfo(Long memberId) {
 
         // 멤버를 받은 memberId 로 찾음
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
 
         if (member.getMemberRole() == MemberRole.CUSTOMER){ // 찾은 멤버가 소비자일때
@@ -76,7 +79,7 @@ public class MemberService {
             return new ResponseEntity<OwnerInfoResDto>(ownerInfoResDto, HttpStatusCode.valueOf(200));
         }
 
-        return new ResponseEntity<>(HttpStatusCode.valueOf(500));
+        return new ResponseEntity<>(HttpStatusCode.valueOf(404));
     }
 
 
@@ -84,7 +87,8 @@ public class MemberService {
     @Transactional
     public ResponseEntity<?> modifyInfo(Long memberId, Map<String, Object> modifyReq){
 
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member.getMemberRole() == MemberRole.CUSTOMER) {
             CustomerModifyReqDto modifyRequestDto = CustomerModifyReqDto.builder().modifyReq(modifyReq).build();
@@ -132,8 +136,10 @@ public class MemberService {
 
     @Transactional
     public ResponseEntity<?> blockUser(Long memberId, Long blockMemberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
-        Member blockingMember = memberRepository.findById(blockMemberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member blockingMember = memberRepository.findById(blockMemberId).orElseThrow(
+                () -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         BlackList blackList = BlackList.builder().member(member).blockedUserId(blockMemberId).build();
         blackListRepository.save(blackList);
