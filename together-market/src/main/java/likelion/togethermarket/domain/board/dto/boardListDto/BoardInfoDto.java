@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -22,12 +23,14 @@ public class BoardInfoDto {
     @Nullable
     private String photo;
 
+    private List<Integer> purchased_products;
+
     private String content;
     private int like_count;
     private boolean is_liked;
 
     @Builder
-    public BoardInfoDto(Board board, String photo, int like_count, boolean is_liked) {
+    public BoardInfoDto(Board board, String photo, int like_count, boolean is_liked, List<Integer> purchased_products) {
         this.board_id = board.getId().intValue();
         this.updated_at = board.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         this.rating = board.getRating();
@@ -35,6 +38,7 @@ public class BoardInfoDto {
         this.content = board.getContent();
         this.like_count = like_count;
         this.is_liked = is_liked;
+        this.purchased_products = purchased_products;
     }
 
     public boolean getIs_liked(){

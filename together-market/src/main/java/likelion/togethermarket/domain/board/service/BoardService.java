@@ -168,10 +168,17 @@ public class BoardService {
             List<BoardPhoto> boardPhotos = boardPhotoRepository.findAllByBoard(board);
             long likeCount = likeRepository.countByBoard(board);
 
+            List<Integer> purchased_products = new ArrayList<>();
+            for (BoardPurchasedProduct purchasedProduct : board.getPurchasedProducts()){
+                purchased_products.add(purchasedProduct.getProduct().getId().intValue());
+            }
+
             BoardInfoDto boardInfoDto = BoardInfoDto.builder().board(board)   // board_info 생성
                     .is_liked(likeRepository.existsByBoardAndMember(board, reqMember))
                     .like_count((int) likeCount)  // photo가 없으면 null 설정
-                    .photo(boardPhotos.isEmpty() ? null : boardPhotos.get(0).getImage()).build();
+                    .photo(boardPhotos.isEmpty() ? null : boardPhotos.get(0).getImage())
+                    .purchased_products(purchased_products)
+                    .build();
 
             MemberInfoDto memberInfoDto = MemberInfoDto.builder().board(board).build();// user_info 생성
 

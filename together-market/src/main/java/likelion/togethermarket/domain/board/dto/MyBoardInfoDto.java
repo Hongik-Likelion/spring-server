@@ -27,7 +27,7 @@ public class MyBoardInfoDto {
     private String content;
 
     @Builder
-    public MyBoardInfoDto(Board board, List<BoardPhoto> boardPhotos) {
+    public MyBoardInfoDto(Board board, List<BoardPhoto> boardPhotos, List<Integer> purchased_products) {
         this.board_id = board.getId().intValue();
         this.updated_at = board.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));;
         this.rating = board.getRating();
