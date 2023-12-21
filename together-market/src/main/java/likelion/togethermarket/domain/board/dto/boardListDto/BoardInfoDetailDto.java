@@ -27,8 +27,10 @@ public class BoardInfoDetailDto {
     private int like_count;
     private boolean is_liked;
 
+    private List<Integer> purchased_products;
+
     @Builder
-    public BoardInfoDetailDto(Board board, List<String> photo, int like_count, boolean is_liked) {
+    public BoardInfoDetailDto(Board board, List<String> photo, int like_count, boolean is_liked, List<Integer> purchased_products) {
         this.board_id = board.getId().intValue();
         this.updated_at = board.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         this.rating = board.getRating();
@@ -36,6 +38,7 @@ public class BoardInfoDetailDto {
         this.content = board.getContent();
         this.like_count = like_count;
         this.is_liked = is_liked;
+        this.purchased_products = purchased_products;
     }
 
     public boolean getIs_liked(){

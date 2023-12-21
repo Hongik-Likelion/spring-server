@@ -208,18 +208,29 @@ public class BoardService {
         List<BoardPhoto> boardPhotos = boardPhotoRepository.findAllByBoard(board);
         long likeCount = likeRepository.countByBoard(board);
 
+        List<Integer> purchased_products = new ArrayList<>();
+        for (BoardPurchasedProduct purchasedProduct : board.getPurchasedProducts()){
+            purchased_products.add(purchasedProduct.getProduct().getId().intValue());
+        }
+
         BoardInfoDetailDto boardInfoDetailDto = BoardInfoDetailDto.builder().board(board)   // board_info 생성
                 .is_liked(likeRepository.existsByBoardAndMember(board, reqMember))
                 .like_count((int) likeCount)
                 .photo(boardPhotos.isEmpty() ? null : boardPhotos.stream()
-                        .map(BoardPhoto::getImage).toList()).build();
+                        .map(BoardPhoto::getImage).toList())
+                .purchased_products(purchased_products)
+                .build();
 
         MemberInfoDto memberInfoDto = MemberInfoDto.builder().board(board).build();// user_info 생성
 
         ShopInfoDto shopInfoDto = ShopInfoDto.builder().board(board).build();// shop_info 생성
 
-        SingleFinalDto finalBoardDto = SingleFinalDto.builder().user_info(memberInfoDto) // 최종 DTO 생성
-                .shop_info(shopInfoDto).board_info(boardInfoDetailDto).build();
+        SingleFinalDto finalBoardDto = SingleFinalDto.builder()
+                .market_name(board.getMarketName())
+                .user_info(memberInfoDto) // 최종 DTO 생성
+                .shop_info(shopInfoDto)
+                .board_info(boardInfoDetailDto)
+                .build();
 
         return new ResponseEntity<SingleFinalDto>(finalBoardDto, HttpStatusCode.valueOf(200));
     }
